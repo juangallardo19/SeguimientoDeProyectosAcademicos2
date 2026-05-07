@@ -4,27 +4,37 @@
 {% block content %}
 <div class="page-header">
     <div>
-        <h1>Proyectos Académicos</h1>
-        <p>{{ total }} registros encontrados</p>
+        <h1>Proyectos <span>Académicos</span></h1>
+        <span class="page-count">{{ total }} registro{{ total|pluralize }}</span>
     </div>
-    <div class="actions">
+    <div class="btn-row">
         {% if not es_docente %}
-            <a href="{% url 'proyecto-create' %}" class="btn primary">+ Nuevo</a>
+            <a href="{% url 'proyecto-create' %}" class="btn btn-primary">+ Nuevo</a>
         {% endif %}
-        <a href="{% url 'exportar-csv' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn secondary">CSV</a>
-        <a href="{% url 'exportar-pdf' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn secondary">PDF</a>
+        <a href="{% url 'exportar-csv' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-secondary">CSV</a>
+        <a href="{% url 'exportar-pdf' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-secondary">PDF</a>
     </div>
 </div>
 
 <form method="get" class="filters">
     <select name="estado" onchange="this.form.submit()">
         <option value="">Todos los estados</option>
-        <option value="enviado" {% if estado_actual == 'enviado' %}selected{% endif %}>Enviado</option>
-        <option value="revision" {% if estado_actual == 'revision' %}selected{% endif %}>En revisión</option>
+        <option value="enviado"  {% if estado_actual == 'enviado'  %}selected{% endif %}>Enviado</option>
+        <option value="revision" {% if estado_actual == 'revision' %}selected{% endif %}>En Revisión</option>
         <option value="aprobado" {% if estado_actual == 'aprobado' %}selected{% endif %}>Aprobado</option>
     </select>
-    {% if estado_actual %}
-        <a href="{% url 'proyecto-list' %}" class="btn danger">Limpiar</a>
+    {% if es_docente %}
+        <select name="estudiante" onchange="this.form.submit()">
+            <option value="">Todos los estudiantes</option>
+            {% for est in estudiantes %}
+                <option value="{{ est.pk }}" {% if estudiante_actual == est.pk|stringformat:"s" %}selected{% endif %}>
+                    {{ est.get_full_name|default:est.username }}
+                </option>
+            {% endfor %}
+        </select>
+    {% endif %}
+    {% if estado_actual or estudiante_actual %}
+        <a href="{% url 'proyecto-list' %}" class="btn btn-danger btn-sm">Limpiar</a>
     {% endif %}
 </form>
 
@@ -43,27 +53,41 @@
         </thead>
         <tbody>
             {% for proyecto in proyectos %}
-                <tr>
-                    <td>{{ proyecto.pk }}</td>
-                    <td>{{ proyecto.titulo }}</td>
-                    {% if es_docente %}<td>{{ proyecto.estudiante.username }}</td>{% endif %}
-                    <td><span class="badge">{{ proyecto.get_estado_display }}</span></td>
-                    <td>{{ proyecto.calificacion|default:'-' }}</td>
-                    <td>{{ proyecto.fecha_envio|date:'d/m/Y' }}</td>
-                    <td>
-                        <a href="{% url 'proyecto-detail' proyecto.pk %}" class="btn small secondary">Ver</a>
+            <tr>
+                <td>{{ proyecto.pk }}</td>
+                <td>{{ proyecto.titulo }}</td>
+                {% if es_docente %}<td>{{ proyecto.estudiante.username }}</td>{% endif %}
+                <td><span class="status-badge status-{{ proyecto.estado }}">{{ proyecto.get_estado_display }}</span></td>
+                <td>{{ proyecto.calificacion|default:'—' }}</td>
+                <td>{{ proyecto.fecha_envio|date:'d/m/Y' }}</td>
+                <td>
+                    <div class="btn-row">
+                        <a href="{% url 'proyecto-detail' proyecto.pk %}" class="btn btn-sm btn-secondary">Ver</a>
                         {% if not es_docente and proyecto.estudiante == user %}
-                            <a href="{% url 'proyecto-update' proyecto.pk %}" class="btn small warning">Editar</a>
-                            <a href="{% url 'proyecto-delete' proyecto.pk %}" class="btn small danger">Eliminar</a>
+                            <a href="{% url 'proyecto-update' proyecto.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                            <a href="{% url 'proyecto-delete' proyecto.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
                         {% endif %}
-                    </td>
-                </tr>
+                    </div>
+                </td>
+            </tr>
             {% empty %}
-                <tr>
-                    <td colspan="7">No hay proyectos registrados.</td>
-                </tr>
+            <tr class="empty-row">
+                <td colspan="{% if es_docente %}7{% else %}6{% endif %}">No hay proyectos registrados.</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if estudiante_actual %}&estudiante={{ estudiante_actual }}{% endif %}">&larr; Anterior</a>
+    {% endif %}
+    <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if estudiante_actual %}&estudiante={{ estudiante_actual }}{% endif %}">Siguiente &rarr;</a>
+    {% endif %}
+</div>
+{% endif %}
 {% endblock %}

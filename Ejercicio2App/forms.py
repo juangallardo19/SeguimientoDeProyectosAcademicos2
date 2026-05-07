@@ -1,7 +1,17 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Submit
 from .models import Proyecto, Comentario
+
+
+class RegistroForm(UserCreationForm):
+    email = forms.EmailField(required=False, label='Correo electrónico (opcional)')
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
 
 
 
@@ -28,23 +38,6 @@ class ProyectoForm(forms.ModelForm):
             Field('descripcion', css_class='form-group'),
             Field('documento', css_class='form-group'),
         )
-
-    def get_queryset(self):
-        qs = Proyecto.objects.select_related('estudiante')
-
-        if not es_docente(self.request.user):
-            qs = qs.filter(estudiante=self.request.user)
-
-        estado = self.request.GET.get('estado')
-        estudiante_id = self.request.GET.get('estudiante')
-
-        if estado:
-            qs = qs.filter(estado=estado)
-
-        if estudiante_id and es_docente(self.request.user):
-            qs = qs.filter(estudiante__id=estudiante_id)
-
-        return qs
 
 class DocenteProyectoForm(forms.ModelForm):
     class Meta:
