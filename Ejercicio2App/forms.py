@@ -27,3 +27,17 @@ class ProyectoForm(forms.ModelForm):
             Field('descripcion', css_class='form-group'),
             Field('documento', css_class='form-group'),
         )
+
+class DocenteProyectoForm(forms.ModelForm):
+    class Meta:
+        model = Proyecto
+        fields = ['estado', 'calificacion']
+        labels = {
+            'estado': 'Estado del proyecto',
+            'calificacion': 'Calificación',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
