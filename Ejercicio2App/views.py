@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
-from django.contrib import messages
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, CreateView
+from django.urls import reverse_lazy
+from .models import Proyecto
+from .forms import ProyectoForm
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -32,3 +33,45 @@ def es_docente(user):
 
 def es_estudiante(user):
     return user.groups.filter(name='estudiante').exists()
+
+class ProyectoListView(LoginRequiredMixin, ListView):
+    model = Proyecto
+    template_name = 'Ejercicio2App/proyecto_list.html'
+    context_object_name = 'proyectos'
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = Proyecto.objects.select_related('estudiante')
+        if not es_docente(self.request.user):
+            qs = qs.filter(estudiante=self.request.user)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['es_docente'] = es_docente(self.request.user)
+        ctx['total'] = self.get_queryset().count()
+        return ctx
+
+
+class ProyectoCreateView(LoginRequiredMixin, CreateView):
+    model = Proyecto
+    form_class = ProyectoForm
+    template_name = 'Ejercicio2App/proyecto_form.html'
+    success_url = reverse_lazy('proyecto-list')
+
+    def dispatch(self, request, *args, **kwargs):
+        if es_docente(request.user):
+            messages.error(request, 'Los docentes no pueden crear proyectos.')
+            return redirect('proyecto-list')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.estudiante = self.request.user
+        messages.success(self.request, 'Proyecto creado exitosamente.')
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['titulo_pagina'] = 'Nuevo Proyecto'
+        ctx['accion'] = 'Crear'
+        return ctx
