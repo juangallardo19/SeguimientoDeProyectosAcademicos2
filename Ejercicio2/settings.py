@@ -13,6 +13,7 @@ CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
     default='http://localhost:8000,http://127.0.0.1:8000'
 ).split(',')
+CSRF_TRUSTED_ORIGINS += ['https://*.vercel.app', 'https://*.now.sh']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -62,10 +63,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Ejercicio2.wsgi.application'
 
-_DATABASE_URL = config('DATABASE_URL', default=None)
+# Neon: prefer unpooled URL for direct connection (no PgBouncer issues with migrations)
+_DATABASE_URL = config('DATABASE_URL_UNPOOLED', default=None) or config('DATABASE_URL', default=None)
 if _DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.parse(_DATABASE_URL, conn_max_age=600, conn_health_checks=True)
+        'default': dj_database_url.parse(_DATABASE_URL, conn_max_age=0)
     }
 else:
     DATABASES = {
@@ -90,7 +92,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
