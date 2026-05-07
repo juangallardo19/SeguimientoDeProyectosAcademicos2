@@ -1,7 +1,8 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field
-from .models import Proyecto
+from crispy_forms.layout import Layout, Field, Submit
+from .models import Proyecto, Comentario
+
 
 
 class ProyectoForm(forms.ModelForm):
@@ -41,3 +42,26 @@ class DocenteProyectoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
+
+class ComentarioForm(forms.ModelForm):
+    class Meta:
+        model = Comentario
+        fields = ['texto']
+        widgets = {
+            'texto': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Escribe tu comentario aquí...'
+            }),
+        }
+        labels = {
+            'texto': 'Comentario',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Field('texto'),
+            Submit('submit', 'Publicar comentario', css_class='btn btn-primary'),
+        )
