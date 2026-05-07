@@ -17,8 +17,10 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 
+from django.contrib.auth.models import Group
+
 from .models import Proyecto, Comentario
-from .forms import ProyectoForm, DocenteProyectoForm, ComentarioForm
+from .forms import ProyectoForm, DocenteProyectoForm, ComentarioForm, RegistroForm
 
 
 # ============================================================
@@ -48,6 +50,25 @@ def login_view(request):
             messages.error(request, 'Usuario o contraseña incorrectos.')
 
     return render(request, 'Ejercicio2App/login.html')
+
+
+def registro_view(request):
+    if request.user.is_authenticated:
+        return redirect('proyecto-list')
+
+    if request.method == 'POST':
+        form = RegistroForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            grupo, _ = Group.objects.get_or_create(name='estudiante')
+            user.groups.add(grupo)
+            login(request, user)
+            messages.success(request, f'Bienvenido, {user.username}. Tu cuenta ha sido creada.')
+            return redirect('proyecto-list')
+    else:
+        form = RegistroForm()
+
+    return render(request, 'Ejercicio2App/registro.html', {'form': form})
 
 
 def logout_view(request):
@@ -304,7 +325,7 @@ def docente_actualizar_proyecto(request, pk):
                 f'Proyecto "{proyecto.titulo}" actualizado correctamente.'
             )
 
-            return redirect('proyecto-detail', pk=pk)
+            return redirect('proyecto-list')
 
         messages.error(request, 'Hay errores en el formulario.')
 

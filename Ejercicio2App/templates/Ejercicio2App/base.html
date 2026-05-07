@@ -4,33 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Ejercicio2{% endblock %}</title>
+    <title>{% block title %}Proyectos Académicos{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <nav class="navbar">
-        <a href="{% url 'proyecto-list' %}" class="brand">Ejercicio2</a>
+    <nav>
+        <a href="{% url 'proyecto-list' %}" class="nav-brand">PROYECTOS<span>.</span></a>
         <div class="nav-links">
             {% if user.is_authenticated %}
-                <a href="{% url 'proyecto-list' %}">Proyectos</a>
+                <a href="{% url 'proyecto-list' %}" class="nav-badge">Proyectos</a>
                 {% if not es_docente %}
-                    <a href="{% url 'proyecto-create' %}">Nuevo</a>
+                    <a href="{% url 'proyecto-create' %}" class="nav-badge">+ Nuevo</a>
                 {% endif %}
                 {% if user.is_staff %}
-                    <a href="{% url 'admin:index' %}">Admin</a>
+                    <a href="{% url 'admin:index' %}" class="nav-badge nav-badge--admin">Admin</a>
                 {% endif %}
-                <a href="{% url 'logout' %}">{{ user.username }} / Salir</a>
+                <a href="{% url 'logout' %}" class="nav-badge">{{ user.username }} / Salir</a>
             {% else %}
-                <a href="{% url 'login' %}">Iniciar sesión</a>
+                <a href="{% url 'login' %}" class="nav-badge">Iniciar sesión</a>
             {% endif %}
         </div>
     </nav>
 
-    <main class="container">
+    <main>
         {% if messages %}
-            {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
+            <div class="alerts">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
         {% endif %}
 
         {% block content %}{% endblock %}

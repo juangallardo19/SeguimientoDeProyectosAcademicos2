@@ -2,17 +2,26 @@
 {% block title %}Iniciar sesión{% endblock %}
 
 {% block content %}
-<div class="form-card small">
-    <h1>Iniciar sesión</h1>
-    <form method="post">
-        {% csrf_token %}
-        <label>Usuario</label>
-        <input type="text" name="username" required autofocus>
-
-        <label>Contraseña</label>
-        <input type="password" name="password" required>
-
-        <button type="submit" class="btn primary">Ingresar</button>
-    </form>
+<div class="login-wrap">
+    <div class="form-box">
+        <h1><span>INICIAR</span> SESIÓN</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Usuario</label>
+                <input type="text" id="id_username" name="username" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="id_password">Contraseña</label>
+                <input type="password" id="id_password" name="password" required>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Ingresar</button>
+            </div>
+        </form>
+        <div class="form-footer-link">
+            ¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate</a>
+        </div>
+    </div>
 </div>
 {% endblock %}

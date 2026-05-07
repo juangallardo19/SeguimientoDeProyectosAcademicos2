@@ -1,0 +1,28 @@
+# Entorno virtual
+venv/
+env/
+
+# Variables de entorno (contiene SECRET_KEY)
+.env
+
+# Base de datos local
+db.sqlite3
+
+# Archivos compilados Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Archivos estáticos generados
+staticfiles/
+
+# Media subida por usuarios
+media/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

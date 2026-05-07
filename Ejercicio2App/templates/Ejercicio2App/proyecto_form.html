@@ -1,16 +1,23 @@
 {% extends 'Ejercicio2App/base.html' %}
-{% load crispy_forms_tags %}
 {% block title %}{{ titulo_pagina }}{% endblock %}
 
 {% block content %}
-<div class="form-card">
-    <h1>{{ titulo_pagina }}</h1>
+<div class="form-box">
+    <h1>{{ titulo_pagina|upper }}</h1>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {% crispy form %}
-        <div class="actions">
-            <button type="submit" class="btn primary">{{ accion }}</button>
-            <a href="{% url 'proyecto-list' %}" class="btn secondary">Cancelar</a>
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+                <span class="field-error">{{ field.errors.0 }}</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{{ accion }}</button>
+            <a href="{% url 'proyecto-list' %}" class="btn btn-secondary">Cancelar</a>
         </div>
     </form>
 </div>

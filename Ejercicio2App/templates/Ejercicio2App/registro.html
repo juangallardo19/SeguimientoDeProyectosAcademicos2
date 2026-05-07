@@ -1,0 +1,31 @@
+{% extends 'Ejercicio2App/base.html' %}
+{% block title %}Crear cuenta{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+    <div class="form-box">
+        <h1>CREAR <span>CUENTA</span></h1>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <span class="field-help">{{ field.help_text }}</span>
+                {% endif %}
+                {% if field.errors %}
+                    <span class="field-error">{{ field.errors.0 }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Registrarme</button>
+            </div>
+        </form>
+        <div class="form-footer-link">
+            ¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
