@@ -1,0 +1,131 @@
+{% extends 'Ejercicio2App/base.html' %}
+{% block title %}{{ proyecto.titulo }}{% endblock %}
+
+{% block content %}
+
+<div class="detail-box">
+
+    <div class="detail-header">
+        <h1>{{ proyecto.titulo }}</h1>
+        <div class="subtitle">
+            Estudiante: {{ proyecto.estudiante.get_full_name|default:proyecto.estudiante.username }}
+        </div>
+    </div>
+
+    <div class="detail-grid">
+
+        {# Columna izquierda: metadatos #}
+        <div class="detail-meta">
+            <div class="detail-row">
+                <span class="detail-label">Estado</span>
+                <span class="detail-value">
+                    <span class="status-badge status-{{ proyecto.estado }}">{{ proyecto.get_estado_display }}</span>
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Calificación</span>
+                <span class="detail-value">
+                    {% if proyecto.calificacion %}{{ proyecto.calificacion }}{% else %}<span style="opacity:.4;">—</span>{% endif %}
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Fecha envío</span>
+                <span class="detail-value">
+                    {{ proyecto.fecha_envio|date:'d/m/Y' }}<br>
+                    <span style="opacity:.45; font-size:.8em;">{{ proyecto.fecha_envio|date:'H:i' }}</span>
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Fecha revisión</span>
+                <span class="detail-value">
+                    {% if proyecto.fecha_revision %}
+                        {{ proyecto.fecha_revision|date:'d/m/Y' }}<br>
+                        <span style="opacity:.45; font-size:.8em;">{{ proyecto.fecha_revision|date:'H:i' }}</span>
+                    {% else %}
+                        <span style="opacity:.4;">Pendiente</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% if proyecto.documento %}
+            <div class="detail-row">
+                <span class="detail-label">Documento</span>
+                <span class="detail-value">
+                    <a href="{{ proyecto.documento.url }}" class="btn btn-sm btn-secondary">Ver archivo</a>
+                </span>
+            </div>
+            {% endif %}
+        </div>
+
+        {# Columna derecha: descripción #}
+        <div class="detail-content">
+            <div>
+                <div class="detail-section-label">Descripción</div>
+                <p class="detail-desc">{{ proyecto.descripcion }}</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="detail-actions">
+        <a href="{% url 'proyecto-list' %}" class="btn btn-secondary">← Volver</a>
+        {% if not es_docente and proyecto.estudiante == user %}
+            <a href="{% url 'proyecto-update' proyecto.pk %}" class="btn btn-warning">Editar</a>
+            <a href="{% url 'proyecto-delete' proyecto.pk %}" class="btn btn-danger">Eliminar</a>
+        {% endif %}
+    </div>
+
+</div>
+
+{# Formulario del docente #}
+{% if es_docente %}
+<div class="form-box" style="margin: 32px 0 0; max-width: 900px;">
+    <h1>ACTUALIZAR <span>PROYECTO</span></h1>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: end;">
+        <form method="post" action="{% url 'docente-actualizar' proyecto.pk %}" id="docente-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ docente_form.estado.id_for_label }}">{{ docente_form.estado.label }}</label>
+                {{ docente_form.estado }}
+                {% if docente_form.estado.errors %}
+                    <span class="field-error">{{ docente_form.estado.errors.0 }}</span>
+                {% endif %}
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="{{ docente_form.calificacion.id_for_label }}">{{ docente_form.calificacion.label }}</label>
+                {{ docente_form.calificacion }}
+                {% if docente_form.calificacion.errors %}
+                    <span class="field-error">{{ docente_form.calificacion.errors.0 }}</span>
+                {% endif %}
+            </div>
+        </form>
+        <div style="display: flex; flex-direction: column; gap: 16px; padding-bottom: 2px;">
+            <p style="font-size: .7rem; letter-spacing: 1.5px; line-height: 1.9; opacity: .45;">
+                Al guardar, la fecha de revisión se actualizará automáticamente y serás redirigido a la lista.
+            </p>
+            <button type="submit" form="docente-form" class="btn btn-primary">Guardar cambios</button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# Sección de comentarios #}
+<div class="comments-section" style="max-width: 900px;">
+    <div class="comments-section-header">Comentarios ({{ comentarios.count }})</div>
+    {% for comentario in comentarios %}
+    <div class="comment-item">
+        <div class="comment-meta">{{ comentario.usuario.username }} — {{ comentario.fecha|date:'d/m/Y H:i' }}</div>
+        <div class="comment-text">{{ comentario.texto }}</div>
+    </div>
+    {% empty %}
+    <div class="comment-empty">Sin comentarios todavía.</div>
+    {% endfor %}
+    {% if puede_comentar %}
+    <div class="comment-footer">
+        <a href="{% url 'comentario-create' proyecto.pk %}" class="btn btn-primary">+ Agregar comentario</a>
+    </div>
+    {% else %}
+    <div class="comment-closed">Comentarios cerrados — el proyecto está aprobado.</div>
+    {% endif %}
+</div>
+
+{% endblock %}

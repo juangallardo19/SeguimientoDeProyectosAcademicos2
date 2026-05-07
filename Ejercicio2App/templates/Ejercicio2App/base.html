@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Proyectos Académicos{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav>
+        <a href="{% url 'proyecto-list' %}" class="nav-brand">PROYECTOS<span>.</span></a>
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+                <a href="{% url 'proyecto-list' %}" class="nav-badge">Proyectos</a>
+                {% if not es_docente %}
+                    <a href="{% url 'proyecto-create' %}" class="nav-badge">+ Nuevo</a>
+                {% endif %}
+                {% if user.is_staff %}
+                    <a href="{% url 'admin:index' %}" class="nav-badge nav-badge--admin">Admin</a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="nav-badge">{{ user.username }} / Salir</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-badge">Iniciar sesión</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main>
+        {% if messages %}
+            <div class="alerts">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

@@ -1,35 +1,28 @@
-# Python
+# Entorno virtual
+venv/
+env/
+
+# Variables de entorno (contiene SECRET_KEY)
+.env
+
+# Base de datos local
+db.sqlite3
+
+# Archivos compilados Python
 __pycache__/
 *.py[cod]
 *.pyo
-.Python
-env/
-venv/
-.venv/
-*.egg-info/
-dist/
-build/
 
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+# Archivos estáticos generados
+staticfiles/
+
+# Media subida por usuarios
 media/
-
-# Environment
-.env
-.env.local
 
 # IDE
 .vscode/
 .idea/
-*.swp
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Static generated
-staticfiles/
-staticfiles_build/
