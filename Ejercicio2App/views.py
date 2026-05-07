@@ -5,6 +5,8 @@ from django.views.generic import DetailView, UpdateView, DeleteView
 from django.utils import timezone
 from django.http import HttpResponseForbidden
 from .forms import DocenteProyectoForm
+from .models import Comentario
+from .forms import ComentarioForm
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -76,4 +78,30 @@ class ProyectoCreateView(LoginRequiredMixin, CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx['titulo_pagina'] = 'Nuevo Proyecto'
         ctx['accion'] = 'Crear'
+        return ctx
+    
+class ComentarioCreateView(LoginRequiredMixin, CreateView):
+    model = Comentario
+    form_class = ComentarioForm
+    template_name = 'Ejercicio2App/comentario_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.proyecto = get_object_or_404(Proyecto, pk=self.kwargs['proyecto_pk'])
+        if not self.proyecto.comentarios_activos():
+            messages.warning(request, 'No se pueden agregar comentarios a un proyecto aprobado.')
+            return redirect('proyecto-detail', pk=self.proyecto.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        form.instance.proyecto = self.proyecto
+        messages.success(self.request, 'Comentario publicado.')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('proyecto-detail', kwargs={'pk': self.proyecto.pk})
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['proyecto'] = self.proyecto
         return ctx

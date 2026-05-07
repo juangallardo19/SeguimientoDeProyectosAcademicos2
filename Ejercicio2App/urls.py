@@ -12,4 +12,5 @@ urlpatterns = [
     path('proyectos/<int:pk>/editar/', views.ProyectoUpdateView.as_view(), name='proyecto-update'),
     path('proyectos/<int:pk>/eliminar/', views.ProyectoDeleteView.as_view(), name='proyecto-delete'),
     path('proyectos/<int:pk>/docente/', views.docente_actualizar_proyecto, name='docente-actualizar'),
+    path('proyectos/<int:proyecto_pk>/comentar/', views.ComentarioCreateView.as_view(), name='comentario-create'),
 ]
