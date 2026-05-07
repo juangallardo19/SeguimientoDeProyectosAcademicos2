@@ -29,6 +29,23 @@ class ProyectoForm(forms.ModelForm):
             Field('documento', css_class='form-group'),
         )
 
+    def get_queryset(self):
+        qs = Proyecto.objects.select_related('estudiante')
+
+        if not es_docente(self.request.user):
+            qs = qs.filter(estudiante=self.request.user)
+
+        estado = self.request.GET.get('estado')
+        estudiante_id = self.request.GET.get('estudiante')
+
+        if estado:
+            qs = qs.filter(estado=estado)
+
+        if estudiante_id and es_docente(self.request.user):
+            qs = qs.filter(estudiante__id=estudiante_id)
+
+        return qs
+
 class DocenteProyectoForm(forms.ModelForm):
     class Meta:
         model = Proyecto
