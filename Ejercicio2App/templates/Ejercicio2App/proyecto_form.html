@@ -1,0 +1,17 @@
+{% extends 'Ejercicio2App/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}{{ titulo_pagina }}{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <h1>{{ titulo_pagina }}</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% crispy form %}
+        <div class="actions">
+            <button type="submit" class="btn primary">{{ accion }}</button>
+            <a href="{% url 'proyecto-list' %}" class="btn secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

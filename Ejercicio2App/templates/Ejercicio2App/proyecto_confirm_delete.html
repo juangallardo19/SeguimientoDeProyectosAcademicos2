@@ -1,0 +1,14 @@
+{% extends 'Ejercicio2App/base.html' %}
+{% block title %}Eliminar proyecto{% endblock %}
+
+{% block content %}
+<div class="form-card small center">
+    <h1>¿Eliminar proyecto?</h1>
+    <p>Vas a eliminar el proyecto <strong>{{ object.titulo }}</strong>.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn danger">Sí, eliminar</button>
+        <a href="{% url 'proyecto-list' %}" class="btn secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}  

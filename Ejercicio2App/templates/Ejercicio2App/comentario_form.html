@@ -1,0 +1,15 @@
+{% extends 'Ejercicio2App/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Nuevo comentario{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <h1>Nuevo comentario</h1>
+    <p>Proyecto: <strong>{{ proyecto.titulo }}</strong></p>
+    <form method="post">
+        {% csrf_token %}
+        {% crispy form %}
+        <a href="{% url 'proyecto-detail' proyecto.pk %}" class="btn secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

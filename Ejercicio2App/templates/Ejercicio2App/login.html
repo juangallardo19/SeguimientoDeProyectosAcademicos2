@@ -1,0 +1,18 @@
+{% extends 'Ejercicio2App/base.html' %}
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<div class="form-card small">
+    <h1>Iniciar sesión</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label>Usuario</label>
+        <input type="text" name="username" required autofocus>
+
+        <label>Contraseña</label>
+        <input type="password" name="password" required>
+
+        <button type="submit" class="btn primary">Ingresar</button>
+    </form>
+</div>
+{% endblock %}
